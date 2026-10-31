@@ -1,12 +1,20 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "femora",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Write and understand Python code for Femora and OpenSees models.",
-  "author": {"name": "Amin Pakzad"},
+  "author": {
+    "name": "Amin Pakzad"
+  },
   "repository": "https://github.com/GeotechUW/femora-ai",
   "homepage": "https://femora.io/",
-  "keywords": ["femora", "opensees", "python", "finite-element", "hpc"],
+  "keywords": [
+    "femora",
+    "opensees",
+    "python",
+    "finite-element",
+    "hpc"
+  ],
   "extensions": {
     "com.openai": {
       "interface": {
@@ -20,7 +28,9 @@
           "Create a five-layer elastic soil mesh without assembling it.",
           "Explain how to submit a Femora workflow to Stampede3.",
           "Help me build a pile and connect it to a soil domain."
-        ]
+        ],
+        "logo": "assets/femora.png",
+        "composerIcon": "assets/femora.png"
       },
       "review": {
         "prompts": [
