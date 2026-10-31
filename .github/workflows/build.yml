@@ -82,6 +82,7 @@ jobs:
           path: |
             build/dist/*.zip
             build/build-manifest.json
+            build/mcp/femora-knowledge.json
           if-no-files-found: error
       - name: Summarize build
         run: |
@@ -94,3 +95,38 @@ jobs:
               out.write('Download the artifact for ChatGPT, Claude Code, and standalone skill ZIPs.\n\n')
               out.write('Packages built only. No AI platform publication or installed-plugin update occurred.\n')
           PY
+
+  publish-knowledge:
+    if: github.event_name != 'pull_request'
+    needs: [build, mcp-tests]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: femora-ai-*
+          merge-multiple: true
+          path: generated
+      - name: Publish generated reference data
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release view knowledge-latest >/dev/null 2>&1 || gh release create knowledge-latest --title "Generated Femora knowledge" --notes "Machine-generated documentation snapshot for the read-only MCP service. Not an AI platform publication." --prerelease
+          gh release upload knowledge-latest generated/mcp/femora-knowledge.json --clobber
+
+  mcp-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r server/requirements.txt
+      - run: python -m unittest discover -s server/tests -v
+      - run: python -m server.tests.smoke_http

@@ -78,3 +78,7 @@ Femora is maintained by Amin Pakzad and contributors. The API references, concep
 - Website: https://femora.io/
 - Source: https://github.com/GeotechUW/Femora
 - AI package issues: https://github.com/GeotechUW/femora-ai/issues
+
+## Optional Render MCP service
+
+The read-only Python MCP service and its free-plan Render Blueprint are documented in [Deploy on Render](docs/render.md). It serves generated documentation through search, exact API lookup, and paginated reference tools. It does not run simulations. Deployment and a public MCP-capable submission remain separate from this source setup.
