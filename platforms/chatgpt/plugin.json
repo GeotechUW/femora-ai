@@ -1,0 +1,38 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "femora",
+  "version": "1.2.0",
+  "description": "Write and understand Python code for Femora and OpenSees models.",
+  "author": {"name": "Amin Pakzad"},
+  "repository": "https://github.com/GeotechUW/femora-ai",
+  "homepage": "https://femora.io/",
+  "keywords": ["femora", "opensees", "python", "finite-element", "hpc"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "Femora",
+        "shortDescription": "Python modeling for OpenSees",
+        "longDescription": "Write and explain Femora Python code using bundled exact API signatures, concept guides, and worked examples. Get help with soils, piles, buildings, meshing, assembly, interfaces, loads, analysis, recorders, workflows, jobs, and results. The plugin provides coding guidance; it does not run simulations or submit jobs itself. Validate generated code in your own Femora environment.",
+        "developerName": "Amin Pakzad",
+        "category": "Developer Tools",
+        "capabilities": [],
+        "defaultPrompt": [
+          "Create a five-layer elastic soil mesh without assembling it.",
+          "Explain how to submit a Femora workflow to Stampede3.",
+          "Help me build a pile and connect it to a soil domain."
+        ]
+      },
+      "review": {
+        "prompts": [
+          "Create a five-layer elastic soil mesh without assembling it.",
+          "Explain how to submit a Femora workflow to Stampede3.",
+          "Use model.material.nd.magic_soil()."
+        ]
+      },
+      "publication": {
+        "countries": [],
+        "release_notes": "Generate shared Femora references with the upstream generator and package them for AI assistants."
+      }
+    }
+  }
+}
