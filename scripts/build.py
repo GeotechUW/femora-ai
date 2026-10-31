@@ -153,6 +153,11 @@ def package(bundle: Path, output: Path, provenance: dict, version: str) -> None:
         write_json(manifest_path, manifest)
         zip_directory(target, archives / f'femora-{platform}-{version}.zip')
     zip_directory(shared, archives / f'femora-skill-{version}.zip', 'femora/')
+    documents = []
+    for path in sorted((shared / 'references').glob('*/*.md')):
+        content = path.read_text(encoding='utf-8')
+        documents.append({'path': path.relative_to(shared).as_posix(), 'content': content, 'sha256': digest(content.encode())})
+    write_json(output / 'mcp/femora-knowledge.json', {'schema_version': 1, 'source_commit': provenance['source_commit'], 'documents': documents})
     files = {p.relative_to(output).as_posix(): digest(p.read_bytes()) for p in sorted(output.rglob('*')) if p.is_file()}
     write_json(output / 'build-manifest.json', {**provenance, 'package_version': version, 'files': files})
 
