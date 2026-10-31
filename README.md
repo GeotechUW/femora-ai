@@ -63,11 +63,13 @@ If Femora changes its generator, the build deliberately stops. Review the new ge
 - `platforms/`: small platform-specific manifests.
 - `scripts/`: splitting, packaging, and integrity checks.
 - `tests/`: content-preservation, corruption detection, and package reproducibility checks.
+- `site/`: public overview, support, privacy, and terms pages.
+- `assets/`: existing Femora branding bundled in the ChatGPT package.
 - `.github/workflows/`: automated builds with a read-only repository token.
 
 ## Public submission status
 
-This is a working build pipeline, not a published public plugin. Icons, approved public support/privacy/terms pages and verified URLs, publisher verification, and platform review remain separate. No GitHub Pages deployment is configured by this change.
+This is a working build pipeline, not a published public plugin. The icon is bundled and the four static page sources are in `site/`. The Pages deployment workflow is configured; repository Settings → Pages must use GitHub Actions. Public URLs are added to a separate submission copy only after live verification. Publisher verification and platform review remain separate.
 
 ## Upstream and attribution
 

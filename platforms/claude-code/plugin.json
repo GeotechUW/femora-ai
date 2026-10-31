@@ -1,8 +1,10 @@
 {
   "name": "femora",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Write Femora Python code using exact API references, concepts, and examples.",
-  "author": {"name": "Amin Pakzad"},
+  "author": {
+    "name": "Amin Pakzad"
+  },
   "homepage": "https://femora.io/",
   "repository": "https://github.com/GeotechUW/femora-ai"
 }

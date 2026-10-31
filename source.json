@@ -3,5 +3,5 @@
   "ref": "main",
   "generator": "agent/build_knowledge.py",
   "generator_sha256": "58f947c26dc734a122f4d821df77fcca36efabfb87d1d28cc5bbe72980343450",
-  "package_version": "1.2.0"
+  "package_version": "1.2.1"
 }

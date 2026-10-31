@@ -148,6 +148,8 @@ def package(bundle: Path, output: Path, provenance: dict, version: str) -> None:
             for prompt in interface['defaultPrompt']:
                 if not prompt.strip() or len(prompt) > 128:
                     raise ValueError('Invalid starter prompt')
+        if platform == 'chatgpt':
+            shutil.copytree(ROOT / 'assets', target / 'assets')
         write_json(manifest_path, manifest)
         zip_directory(target, archives / f'femora-{platform}-{version}.zip')
     zip_directory(shared, archives / f'femora-skill-{version}.zip', 'femora/')
