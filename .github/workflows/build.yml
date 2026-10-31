@@ -1,0 +1,96 @@
+name: Build AI packages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 9 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PYVISTA_OFF_SCREEN: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Read upstream configuration
+        id: config
+        run: |
+          python - <<'PY'
+          import json, os, re
+          config = json.load(open('source.json'))
+          if not re.fullmatch(r'[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+', config['repository']):
+              raise ValueError('Invalid source repository')
+          if not re.fullmatch(r'[A-Za-z0-9_./-]+', config['ref']) or config['ref'].startswith('-'):
+              raise ValueError('Invalid source ref')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write('repository=' + config['repository'] + '\n')
+              out.write('ref=' + config['ref'] + '\n')
+          PY
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ steps.config.outputs.repository }}
+          ref: ${{ steps.config.outputs.ref }}
+          path: .upstream
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Resolve source commit
+        id: source
+        run: echo "sha=$(git -C .upstream rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+      - name: Reuse packages for unchanged source and build configuration
+        id: cached
+        uses: actions/cache@v4
+        with:
+          path: build
+          key: packages-${{ runner.os }}-py312-${{ github.sha }}-${{ steps.source.outputs.sha }}
+      - name: Verify upstream generator before executing source
+        run: |
+          python - <<'PY'
+          import hashlib, json, pathlib
+          config = json.load(open('source.json'))
+          generator = pathlib.Path('.upstream') / config['generator']
+          assert hashlib.sha256(generator.read_bytes()).hexdigest() == config['generator_sha256'], 'Generator changed; review and update source.json'
+          PY
+      - name: Test packager
+        run: python -m unittest discover -s tests -v
+      - name: Install Femora for signature extraction
+        if: steps.cached.outputs.cache-hit != 'true'
+        run: python -m pip install -e .upstream
+      - name: Generate, validate, and package
+        if: steps.cached.outputs.cache-hit != 'true'
+        run: python scripts/build.py --source .upstream
+      - name: Verify generated checksums
+        run: python scripts/verify.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: femora-ai-${{ steps.source.outputs.sha }}
+          path: |
+            build/dist/*.zip
+            build/build-manifest.json
+          if-no-files-found: error
+      - name: Summarize build
+        run: |
+          python - <<'PY'
+          import json, os
+          m = json.load(open('build/build-manifest.json'))
+          with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as out:
+              out.write('# Femora AI packages\n\n')
+              out.write('Femora source: `' + m['source_commit'] + '`\n\n')
+              out.write('Download the artifact for ChatGPT, Claude Code, and standalone skill ZIPs.\n\n')
+              out.write('Packages built only. No AI platform publication or installed-plugin update occurred.\n')
+          PY
